@@ -1,17 +1,13 @@
-FROM webdevops/php-nginx:8.1
+FROM php:8.1-apache
 
-# Konfigurasi folder utama web
-ENV WEB_DOCUMENT_ROOT=/app
-ENV WEB_DOCUMENT_INDEX=index.php
-
-# PAKSA Nginx bawaan image ini untuk berjalan di port 8000 secara sistem
-ENV WEB_HTTP_PORTS=8000
-
-# Pasang ekstensi mysqli bawaan proyekmu
+# Pasang ekstensi mysqli yang wajib untuk database proyekmu
 RUN docker-php-ext-install mysqli && docker-php-ext-enable mysqli
 
-# Copy semua file kodinganmu ke folder web server
-COPY . /app/
+# Copy seluruh kodinganmu ke folder server apache
+COPY . /var/www/html/
 
-# Buka port 8000
-EXPOSE 8000
+# Paksa Apache untuk membaca folder kerja di /var/www/html/
+ENV APACHE_DOCUMENT_ROOT /var/www/html
+
+# Buka port standar container
+EXPOSE 80
