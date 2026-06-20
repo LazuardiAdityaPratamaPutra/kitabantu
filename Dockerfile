@@ -6,16 +6,14 @@ RUN docker-php-ext-install mysqli && docker-php-ext-enable mysqli
 # Pasang Nginx standar
 RUN apk add --no-cache nginx
 
-# HAPUS ALL CONFIG DEFAULT (Biar gak ada conflict server name di port 80)
+# Amankan konfigurasi agar murni memakai file kita
 RUN rm -f /etc/nginx/http.d/*.conf
-
-# Masukkan file nginx.conf kita sebagai satu-satunya config utama
 COPY nginx.conf /etc/nginx/http.d/kitabantu.conf
 
-# Copy semua file kodingan lu ke folder server
+# Copy semua kodingan lu
 COPY . /var/www/html
 
-# Jalankan PHP-FPM dan Nginx barengan
+# Jalankan PHP-FPM dan Nginx secara bersamaan
 CMD php-fpm -D && nginx -g "daemon off;"
 
 EXPOSE 80
