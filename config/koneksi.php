@@ -1,26 +1,21 @@
 <?php
-// config/koneksi.php
-// Koneksi PDO dengan error handling yang proper
+// koneksi.php
 
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'kitabantu');
-define('DB_USER', 'root');
-define('DB_PASS', '');           // Ganti dengan password MySQL kamu
-define('DB_CHARSET', 'utf8mb4');
+// Mencegah PHP menampilkan error mentah-mentah ke layar server production
+error_reporting(0);
+ini_set('display_errors', 0);
 
-$dsn = "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=" . DB_CHARSET;
+$host     = getenv('MYSQLHOST') ?: 'localhost';
+$user     = getenv('MYSQLUSER') ?: 'root';
+$password = getenv('MYSQLPASSWORD') ?: '';
+$dbname   = getenv('MYSQLDATABASE') ?: 'kitabantu';
+$port     = getenv('MYSQLPORT') ?: '3306';
 
-$options = [
-    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-    PDO::ATTR_EMULATE_PREPARES   => false,   // Wajib false untuk keamanan
-];
+// Menggunakan @ untuk meredam fatal error jika database belum siap/tidak ada di Railway
+$koneksi = @mysqli_connect($host, $user, $password, $dbname, $port);
 
-try {
-    $pdo = new PDO($dsn, DB_USER, DB_PASS, $options);
-} catch (PDOException $e) {
-    // Di production: jangan tampilkan error detail ke user
-    error_log("DB Connection Error: " . $e->getMessage());
-    die(json_encode(['status' => 'error', 'pesan' => 'Koneksi database gagal.']));
+// Jika gagal konek, biarkan aplikasi tetap berjalan (hanya query data yang kosong)
+if (!$koneksi) {
+    // Anda bisa membuat log atau membiarkannya agar halaman login/dashboard web tetap bisa dirender strukturnya
+    $db_error = true; 
 }
-
