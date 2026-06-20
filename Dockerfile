@@ -1,10 +1,10 @@
-FROM php:8.1-apache
+FROM webdevops/php-nginx:8.1
 
-# Mengaktifkan ekstensi mysqli secara resmi di dalam Docker
+# Pasang ekstensi mysqli yang dibutuhkan kitabantu
 RUN docker-php-ext-install mysqli && docker-php-ext-enable mysqli
 
-# Copy semua kodingan ke folder server Apache
-COPY . /var/www/html/
+# Copy semua file kodinganmu ke folder web server Nginx
+COPY . /app/
 
-# Buka port standar container
+# Buka port standar
 EXPOSE 80
